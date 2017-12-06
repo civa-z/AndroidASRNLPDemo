@@ -11,6 +11,8 @@ import java.io.FileOutputStream;
 
 /**
  * Created by 5109U11454 on 2017/12/5.
+ *
+ * https://www.cnblogs.com/whoislcj/p/5477216.html
  */
 
 public class AudioRecordManager {
