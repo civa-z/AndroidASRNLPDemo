@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.sony.civa_z.androidasrnlpdemo.MainActivity">
+
+
+    <LinearLayout
+        android:background="@drawable/boder"
+        android:layout_margin="10pt"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        >
+
+        <TextView
+            android:background="@drawable/boder"
+            android:id="@+id/result"
+            android:layout_width="match_parent"
+            android:layout_height="100pt"
+            android:layout_margin="5px"
+            android:text="Result will be show here" />
+
+        <TextView
+            android:background="@drawable/boder"
+            android:id="@+id/Status"
+            android:layout_width="match_parent"
+            android:layout_height="50pt"
+            android:layout_margin="5px"
+            android:text="Status" />
+
+        <Button
+            android:id="@+id/recordButton"
+            style="@android:style/Widget.Material.Button.Inset"
+            android:layout_width="50pt"
+            android:layout_height="50pt"
+            android:layout_margin="20px"
+            android:text="@string/button_name" />
+    </LinearLayout>
+
+
+</android.support.constraint.ConstraintLayout>
