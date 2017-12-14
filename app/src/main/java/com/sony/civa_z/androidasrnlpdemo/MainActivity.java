@@ -2,21 +2,17 @@ package com.sony.civa_z.androidasrnlpdemo;
 
 import android.annotation.SuppressLint;
 import android.media.AudioFormat;
-import android.media.AudioManager;
-import android.media.AudioTrack;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
     private AudioRecordManager audioRecordManager  = null;
@@ -26,6 +22,8 @@ public class MainActivity extends AppCompatActivity {
     private PcmToWavUtil pcmToWavUtil = null;
     private String pcm_file = null;
     private String wav_file = null;
+    private Handler myhandler = null;
+    private PostThread postThread = null;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -41,54 +39,49 @@ public class MainActivity extends AppCompatActivity {
         wav_file = pcm_file.replace(".pcm", ".wav");
 
         pcmToWavUtil = new PcmToWavUtil(16000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
-
-        record_botton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    //start record
-                    status.setText("onTouch down");
-                    audioRecordManager.startRecord(dir.getAbsolutePath() + "/record.pcm");
-                } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    //stop record
-                    status.setText("onTouch up");
-                    audioRecordManager.stopRecord();
-
-                    pcmToWavUtil.pcmToWav(pcm_file, wav_file);
-
-                    try {
-                        MainActivity.play(dir.getAbsolutePath() + "/record.pcm");
-                    } catch (IOException e) {
-                        Log.d("Play", "Err1");
-                        e.printStackTrace();
-                    } catch (Throwable throwable) {
-                        Log.d("Play", "Err2");
-                        throwable.printStackTrace();
-                    }
-                }
-                return true;
-            }
-        });
+        record_botton.setOnTouchListener(new MyOnTouchListener());
+        myhandler = new MyHandler();
+        postThread = new PostThread(wav_file, myhandler);
     }
-    public static void play(String path) throws Throwable {
-        int bufferSize = AudioTrack.getMinBufferSize(16000, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
-        AudioTrack audioTrack= new AudioTrack(AudioManager.STREAM_MUSIC, 16000, AudioFormat.CHANNEL_OUT_MONO,AudioFormat.ENCODING_PCM_16BIT, bufferSize, AudioTrack.MODE_STREAM);
-        audioTrack.play();
-        DataInputStream dos = new DataInputStream(new FileInputStream(path));
-        byte[] tempBuffer = new byte[bufferSize];
-        int offset = 0;
-        while(true){
-            int len = dos.read(tempBuffer);
-            if (len > 0) {
-                Log.d("Play", String.valueOf(len));
-                audioTrack.write(tempBuffer, 0, tempBuffer.length);
-            }else{
-                break;
+
+    private class MyOnTouchListener implements View.OnTouchListener {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                //start record
+                status.setText("onTouch down");
+                postThread.interrupt();
+                audioRecordManager.startRecord(pcm_file);
+            } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                //stop record
+                status.setText("onTouch up");
+                audioRecordManager.stopRecord();
+                pcmToWavUtil.pcmToWav(pcm_file, wav_file);
+                postThread.start();
+                PlayThread playThread = new PlayThread(pcm_file);
+                playThread.start();
             }
+            return true;
         }
-        dos.close();
-        audioTrack.stop();
-        audioTrack.release();
     }
 
+    private class MyHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg){
+            switch (msg.what){
+                case 1:
+                    status.setText("Send start");
+                    break;
+                case 2:
+                    status.setText("Send end");
+                    break;
+                case 3:
+                    status.setText("Receive responds");
+                    break;
+                default:
+                    break;
+            }
+            super.handleMessage(msg);
+        }
+    }
 }
