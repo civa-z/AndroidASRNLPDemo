@@ -16,6 +16,7 @@ import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
     private AudioRecordManager audioRecordManager  = null;
+    private TextView result = null;
     private TextView status = null;
     private Button record_botton = null;
     private File dir = null;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         record_botton = findViewById(R.id.recordButton);
         status = findViewById(R.id.Status);
+        result = findViewById(R.id.result);
         audioRecordManager = AudioRecordManager.getInstance();
 
         dir = new File(Environment.getExternalStorageDirectory(),"sounds");
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         record_botton.setOnTouchListener(new MyOnTouchListener());
         myhandler = new MyHandler();
         postThread = new PostThread(wav_file, myhandler);
+        postThread.start();
     }
 
     private class MyOnTouchListener implements View.OnTouchListener {
@@ -49,15 +52,15 @@ public class MainActivity extends AppCompatActivity {
         public boolean onTouch(View v, MotionEvent event) {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 //start record
-                status.setText("onTouch down");
-                postThread.interrupt();
+                status.setText("Touch down");
                 audioRecordManager.startRecord(pcm_file);
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
                 //stop record
-                status.setText("onTouch up");
+                status.setText("Touch up");
+                record_botton.setEnabled(false);
                 audioRecordManager.stopRecord();
                 pcmToWavUtil.pcmToWav(pcm_file, wav_file);
-                postThread.start();
+                postThread.postHandler.sendMessage(new Message());
                 PlayThread playThread = new PlayThread(pcm_file);
                 playThread.start();
             }
@@ -69,6 +72,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg){
             switch (msg.what){
+                case -1:
+                    status.setText("Send error: " + msg.obj.toString());
+                    break;
                 case 1:
                     status.setText("Send start");
                     break;
@@ -77,10 +83,13 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case 3:
                     status.setText("Receive responds");
+                    String resultMsg = msg.obj.toString();
+                    result.setText(resultMsg);
                     break;
                 default:
                     break;
             }
+            record_botton.setEnabled(true);
             super.handleMessage(msg);
         }
     }
