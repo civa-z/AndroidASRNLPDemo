@@ -2,13 +2,10 @@ package com.sony.civa_z.androidasrnlpdemo;
 
 
 import android.annotation.SuppressLint;
-import android.media.MediaRecorder;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
-
-import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;

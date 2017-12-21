@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private String wav_file = null;
     private Handler myhandler = null;
     private PostThread postThread = null;
+    private PackageControler packageControler = null;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
         status = findViewById(R.id.Status);
         result = findViewById(R.id.result);
         audioRecordManager = AudioRecordManager.getInstance();
+        packageControler = new PackageControler(this);
 
         dir = new File(Environment.getExternalStorageDirectory(),"sounds");
         pcm_file = dir.getAbsolutePath() + "/record.pcm";
@@ -84,7 +86,13 @@ public class MainActivity extends AppCompatActivity {
                 case 3:
                     status.setText("Receive responds");
                     String resultMsg = msg.obj.toString();
-                    result.setText(resultMsg);
+                    ResultParser resultParser = new ResultParser(resultMsg);
+                    if (resultParser.analysis()){
+                        result.setText(resultParser.utterance + "\n" + resultParser.Intention_List[resultParser.id - 1]);
+                        packageControler.activePackage(resultParser.Intention_List[resultParser.id - 1], resultParser.utterance);
+                    } else{
+                        result.setText(resultParser.utterance + "\n" + "Error");
+                    }
                     break;
                 default:
                     break;
