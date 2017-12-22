@@ -24,7 +24,7 @@ import java.net.URL;
 
 //子线程：使用POST方法向服务器发送用户名、密码等数据
 class PostThread extends Thread {
-    private String strUrlPath = "http://192.168.0.121:3010/recognize?timeout=10";
+    private String strUrlPath = "http://192.168.0.121:3010/recognize?timeout=50";
     private int bufferSize = 1024;
     private String data_path = null;
     private Handler mainHandler = null;

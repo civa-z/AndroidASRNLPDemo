@@ -19,14 +19,17 @@ public class ResultParser {
     String host_id;
     String utterance;
     int id;
+    private int status;
     Float[] intention;
     ResultParser(String s){
         this.s = s;
     }
     boolean analysis(){
         try {
+            Log.d("analysis", s);
             JSONObject jsonObject = new JSONObject(s);
             host_id = jsonObject.getString("id");
+            status = jsonObject.getInt("status");
             JSONArray hypotheses = jsonObject.getJSONArray("hypotheses");
             JSONObject hypotheses0 = hypotheses.getJSONObject(0);
             utterance = hypotheses0.getString("utterance");
@@ -39,7 +42,7 @@ public class ResultParser {
             }
             intention = (Float[])intention_list.toArray(new Float[intention_list.size()]);
 
-            if (utterance.length() <= 0){
+            if (utterance.length() <= 0 || status != 0 || id <= 0){
                 return false;
             }
             return true;

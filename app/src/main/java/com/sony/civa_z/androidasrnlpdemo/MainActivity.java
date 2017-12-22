@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
             switch (msg.what){
                 case -1:
                     status.setText("Send error: " + msg.obj.toString());
+                    record_botton.setEnabled(true);
                     break;
                 case 1:
                     status.setText("Send start");
@@ -93,11 +94,12 @@ public class MainActivity extends AppCompatActivity {
                     } else{
                         result.setText(resultParser.utterance + "\n" + "Error");
                     }
+                    record_botton.setEnabled(true);
                     break;
                 default:
                     break;
             }
-            record_botton.setEnabled(true);
+
             super.handleMessage(msg);
         }
     }
