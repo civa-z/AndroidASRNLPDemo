@@ -24,7 +24,7 @@ import java.net.URL;
 
 //子线程：使用POST方法向服务器发送用户名、密码等数据
 class PostThread extends Thread {
-    private String strUrlPath = "http://192.168.0.121:3010/recognize?timeout=50";
+    private String ip = null;
     private int bufferSize = 1024;
     private String data_path = null;
     private Handler mainHandler = null;
@@ -33,6 +33,10 @@ class PostThread extends Thread {
     PostThread(String data_path,  Handler mainHandler){
         this.data_path = data_path;
         this.mainHandler = mainHandler;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
     }
 
     @SuppressLint("HandlerLeak")
@@ -53,6 +57,7 @@ class PostThread extends Thread {
 
         try {
             Log.d("PostThread: ", "start");
+            String strUrlPath = "http://" + ip + ":3010/recognize?timeout=50";
             URL url = new URL(strUrlPath);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
