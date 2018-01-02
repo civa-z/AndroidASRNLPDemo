@@ -90,7 +90,9 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
             String new_ip = ip_text.getText().toString();
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(ip_text.getWindowToken(), 0) ;
+            if (imm != null)
+                imm.hideSoftInputFromWindow(ip_text.getWindowToken(), 0) ;
+
             status.setText("Set new IP: " + new_ip);
             postThread.setIp(new_ip);
         }
